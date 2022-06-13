@@ -1,0 +1,104 @@
+{% extends 'main/base.html' %}
+{% block title %}
+Home page
+{% endblock title %}
+
+
+{% block content %}
+
+
+<div class="url-field">
+    {{ message }}
+    {% if error %}
+        <br>
+        {{ error }}
+    {% endif %}
+    {% if table_data and table_headers %}
+    
+        <table class="table table-striped">
+            <thead class="thead-dark">
+                <tr>
+                    <th scope="col">№</th>
+                    {% for header in table_headers %}
+                        <th scope="col">{{ header }}</th>
+                    {% endfor %}
+                </tr>
+            </thead>
+            {% for row in table_data %}
+            <tr>
+                <td scope="row">{{ forloop.counter }}</td>
+                {% for col in row %}
+                    <td scope="row">{{ col }}</td>
+                {% endfor %}
+            </tr>
+            {% endfor %}
+        </table>
+    
+
+        <nav aria-label="Page navigation example">
+            <ul class="pagination justify-content-end">
+                {% if table_data.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link" 
+                            href="?page={{ table_data.previous_page_number }}&selected-catalog={{ catalog_id }}
+                            &selected-version={{ catalog_version }}&selected-date={{ selected_date }}"
+                            style="color:black">
+                            Previous
+                        </a>
+                    </li>
+                {% else %}
+                    <li class="page-item disabled">
+                        <a class="page-link" 
+                            tabindex="-1">
+                            Previous
+                        </a>
+                    </li>
+                {% endif %}
+                {% for p in table_data.paginator.page_range %}
+                    {% if table_data.number == p %}
+                        <li class="page-item active">
+                            <span class="page-link" style="background-color:#343a40; border-color: #343a40;" >
+                                {{ p }}
+                                <span class="sr-only" >(current)</span>
+                            </span>
+                        </li>
+                    {% else %}
+                        <li class="page-item">
+                            <a class="page-link" 
+                                href="?page={{ p }}&selected-catalog={{ catalog_id }}
+                                &selected-version={{ catalog_version }}&selected-date={{ selected_date }}"
+                                style="color:black">{{ p }}
+                            </a>
+                        </li>
+                    {% endif %}
+                {% endfor %}
+    
+                {% if table_data.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" 
+                            href="?page={{ table_data.next_page_number }}&selected-catalog={{ catalog_id }}
+                            &selected-version={{ catalog_version }}&selected-date={{ selected_date }}
+                            "
+                            style="color:black">
+                            Next
+                        </a>
+                    </li>
+                {% else %}
+                    <li class="page-item disabled">
+                        <a class="page-link" 
+                            tabindex="-1">
+                            Next
+                        </a>
+                    </li>
+                {% endif %}
+            </ul>
+          </nav>
+    {% endif %}
+
+    <div class="result-url">
+    </div>
+
+</div>
+
+
+{% endblock content %}

@@ -1,0 +1,63 @@
+{% extends 'main/base.html' %}
+{% block title %}
+Home page
+{% endblock title %}
+
+
+{% block content %}
+
+
+<div class="url-field">
+    
+    <form action="{% url 'fill-db' %}" method="GET">
+        {%csrf_token%}
+        <button type="submit" class="btn btn-outline-success my_button">Заполнить бд</button>
+    </form>
+    <br>
+    <form action="{% url 'truncate-tables' %}" method="GET">
+        {%csrf_token%}
+        <button type="submit" class="btn btn-outline-success my_button">Очистить базу</button>
+    </form>
+    <br>
+    <br>
+    <form action="{% url 'get-catalog-list' %}" method="GET">
+        {%csrf_token%}
+        <div style="float: right">
+            <button type="submit" class="btn btn-outline-success my_button">Получить список каталогов</button>
+        </div>
+    </form>
+    <br>
+    <br>
+    <form action="{% url 'get-catalog-on-date' %}" method="GET">
+        {%csrf_token%}
+        <div style="float: right">
+            <input type="date" name="selected-date" style="border: none; border:solid 1px #343a40;
+            border-radius: 5px; padding:6px 6px;
+    padding-top: 3px;
+    ">
+            <button type="submit" class="btn btn-outline-success my_button">Список каталогов на дату</button>
+        </div>
+    </form>
+    <br>
+    <br>
+    <form action="{% url 'get-elements-from-catalog' %}" method="GET">
+        {%csrf_token%}
+        <div style="float: right">
+            <input type="text" name="selected-catalog" placeholder="Id спрвочника" class="my_input">
+            <button type="submit" class="btn btn-outline-success my_button">Список элементов каталога</button>
+        </div>
+    </form>
+    <br>
+    <br>
+    <form action="{% url 'get-elements-from-catalog-by-version' %}" method="GET">
+        {%csrf_token%}
+        <div style="float: right">
+            <input type="text" name="selected-catalog" placeholder="Название спрвочника" class="my_input">
+            <input type="text" name="selected-version" placeholder="Версия спрвочника" class="my_input">
+            <button type="submit" class="btn btn-outline-success my_button">Список элементов каталога</button>
+        </div>
+    </form>
+</div>
+
+
+{% endblock content %}
