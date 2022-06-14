@@ -23,7 +23,7 @@ Home page
     <form action="{% url 'get-catalog-list' %}" method="GET">
         {%csrf_token%}
         <div style="float: right">
-            <button type="submit" class="btn btn-outline-success my_button">Получить список каталогов</button>
+            <button type="submit" class="btn btn-outline-success my_button">Получить список справочников</button>
         </div>
     </form>
     <br>
@@ -35,7 +35,7 @@ Home page
             border-radius: 5px; padding:6px 6px;
     padding-top: 3px;
     ">
-            <button type="submit" class="btn btn-outline-success my_button">Список каталогов на дату</button>
+            <button type="submit" class="btn btn-outline-success my_button">Список справочников на дату</button>
         </div>
     </form>
     <br>
@@ -43,8 +43,8 @@ Home page
     <form action="{% url 'get-elements-from-catalog' %}" method="GET">
         {%csrf_token%}
         <div style="float: right">
-            <input type="text" name="selected-catalog" placeholder="Id спрвочника" class="my_input">
-            <button type="submit" class="btn btn-outline-success my_button">Список элементов каталога</button>
+            <input type="text" name="selected-catalog" placeholder="Id справочника" class="my_input">
+            <button type="submit" class="btn btn-outline-success my_button">Список элементов справочника</button>
         </div>
     </form>
     <br>
@@ -52,9 +52,36 @@ Home page
     <form action="{% url 'get-elements-from-catalog-by-version' %}" method="GET">
         {%csrf_token%}
         <div style="float: right">
+            <input type="text" name="selected-catalog" placeholder="Название справочника" class="my_input">
+            <input type="text" name="selected-version" placeholder="Версия справочника" class="my_input">
+            <button type="submit" class="btn btn-outline-success my_button">Список элементов справочника</button>
+        </div>
+    </form>
+    <br>
+    <br>
+    <br>
+    <form action="{% url 'validate-catalog-element-by-version' %}" method="GET">
+        {%csrf_token%}
+        <div style="float: right">
             <input type="text" name="selected-catalog" placeholder="Название спрвочника" class="my_input">
             <input type="text" name="selected-version" placeholder="Версия спрвочника" class="my_input">
-            <button type="submit" class="btn btn-outline-success my_button">Список элементов каталога</button>
+            <button type="submit" class="btn btn-outline-success my_button">Валидация элемента справочника</button>
+            <br>
+            <input type="text" name="element-code" placeholder="Код элемента" class="my_input">
+            <input type="text" name="element-value" placeholder="Значение элемента" class="my_input">
+            <br>
+            <br>
+        </div>
+    </form>
+    <br>
+    <br>
+    <form action="{% url 'update-element-by-id' %}" method="POST">
+        {%csrf_token%}
+        <div style="float: right">
+            <input type="text" name="element-id" placeholder="Id элемента" class="my_input">
+            <input type="text" name="element-code" placeholder="Новый Код элемента" class="my_input">
+            <input type="text" name="element-value" placeholder="Новое Значение элемента" class="my_input">
+            <button type="submit" class="btn btn-outline-success my_button">Обновить элемент справочника</button>
         </div>
     </form>
 </div>

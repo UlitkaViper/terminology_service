@@ -294,13 +294,13 @@ def get_elements_from_catalog_by_version(request):
             if not request.GET.get("selected-catalog") or not request.GET.get("selected-version"):
                 raise TypeError("Переданы пустые параметры")
 
-            catalog_id = request.GET["selected-catalog"].rstrip(" ").rstrip("\t")
-            catalog_version = request.GET["selected-version"].rstrip(" ").rstrip("\t")
+            catalog_name = request.GET.get("selected-catalog").strip(" ").strip("\t")
+            catalog_version = request.GET.get("selected-version").strip(" ").strip("\t")
             catalog_elements = (
                 tables.CatalogElement.objects
                 .select_related('catalog')
                 .filter(
-                    catalog__name=catalog_id,
+                    catalog__name=catalog_name,
                     catalog__version=catalog_version,
                     catalog__version_start_date__lte=datetime.now().date()
                 )
@@ -340,7 +340,145 @@ def get_elements_from_catalog_by_version(request):
             "message": "Данные успешно получены",
             "table_data": elements,
             "table_headers": table_headers,
-            "catalog_id": catalog_id,
+            "catalog_id": catalog_name,
             "catalog_version": catalog_version,
+        }
+        return render(request, 'main/main_response_page.html', response_data)
+
+
+def update_element_by_id(request):
+    """
+    Обновление элемента справочника по ID
+
+    Args:
+        request
+
+    Raises:
+        TypeError: Переданы пустые данные
+        ValueError: Неправильный формат кода элемента
+
+    Returns:
+        Сообщение об успешном/неуспешном выполнении
+    """
+
+    if request.method == "POST":
+        try:
+            if not request.POST.get("element-id"):
+                raise TypeError("Передан пустой ID справочника")
+
+            element_id = int(request.POST.get("element-id").strip(" ").strip("\t"))
+            element_code = request.POST.get("element-code", "").strip(" ").strip("\t")
+            if element_code and not element_code.isdigit():
+                raise ValueError("Неправильный формат кода элемента")
+            values_to_update = {
+                "code": element_code,
+                "value": request.POST.get("element-value", "").strip(" ").strip("\t")
+            }
+
+            catalog_element = (
+                tables.CatalogElement.objects
+                .filter(id=element_id)
+            )
+
+            if not catalog_element:
+                return render(
+                    request,
+                    'main/main_response_page.html',
+                    {"message": "Нет данных по указанным параметрам"}
+                )
+            catalog_element.update(**values_to_update)
+            element_data = catalog_element.values_list()
+
+            # Пагинация
+            p = Paginator(element_data, 10)
+            page = request.GET.get('page')
+            elements = p.get_page(page)
+            table_headers = get_table_headers(tables.CatalogElement)
+
+        except ValueError as e:
+            # error = "Неверный тип идентификатора каталога"
+            return render(
+                request,
+                'main/main_response_page.html',
+                {"error": e, "message": "Данные не получены"}
+            )
+        except Exception as e:
+            return render(
+                request,
+                'main/main_response_page.html',
+                {"error": e, "message": "Данные не получены"}
+            )
+
+        response_data = {
+            "message": "Данные успешно обновлены",
+            "table_data": elements,
+            "table_headers": table_headers,
+        }
+        return render(request, 'main/main_response_page.html', response_data)
+
+
+def validate_catalog_element_by_version(request):
+    """
+    Валидация элемента заданного справочника по указанной версии
+
+    Args:
+        request
+
+    Raises:
+        TypeError: Переданы пустые данные
+        ValueError: Неверный тип идентификатора каталога или версии
+
+    Returns:
+        Список элементов справочника указанной версии
+    """
+
+    if request.method == "GET":
+        try:
+            if not all(request.GET.values()):
+                raise TypeError("Переданы пустые параметры")
+
+            catalog_name = request.GET.get("selected-catalog").strip(" ").strip("\t")
+            catalog_version = request.GET.get("selected-version").strip(" ").strip("\t")
+            element_code = request.GET.get("element-code", "").strip(" ").strip("\t")
+            element_value = request.GET.get("element-value", "").strip(" ").strip("\t")
+            catalog_elements = (
+                tables.CatalogElement.objects
+                .select_related('catalog')
+                .filter(
+                    catalog__name=catalog_name,
+                    catalog__version=catalog_version,
+                    code=element_code,
+                    value=element_value
+                )
+                .values_list(*CATALOG_ELEMENT_FIELDS)
+            )
+
+            if not catalog_elements:
+                return render(
+                    request,
+                    'main/main_response_page.html',
+                    {"message": "Нет данных по указанным параметрам"}
+                )
+
+            table_headers = get_table_headers(tables.CatalogElement)
+
+        except ValueError:
+            error = "Неверный тип одного из параметров"
+            return render(
+                request,
+                'main/main_response_page.html',
+                {"error": error, "message": "Данные не получены"}
+            )
+        except Exception as e:
+            return render(
+                request,
+                'main/main_response_page.html',
+                {"error": e, "message": "Данные не получены"}
+            )
+
+        response_data = {
+            "message": "Данный элемент есть в базе",
+            "table_data": catalog_elements,
+            "table_headers": table_headers,
         }
         return render(request, 'main/main_response_page.html', response_data)
